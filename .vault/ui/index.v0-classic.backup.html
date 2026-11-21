@@ -1,0 +1,1700 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gold Mine · 藏宝阁</title>
+  <style>
+    :root {
+      --bg-main: #0f1117;
+      --bg-panel: #171a24;
+      --bg-card: #1d2130;
+      --bg-card-hover: #24293d;
+      --border: #2c3248;
+      --gold: #f0b952;
+      --gold-soft: rgba(240, 185, 82, 0.14);
+      --gold-border: rgba(240, 185, 82, 0.4);
+      --inner-accent: #c084fc;
+      --inner-soft: rgba(192, 132, 252, 0.14);
+      --inner-border: rgba(192, 132, 252, 0.42);
+      --ext-accent: #38bdf8;
+      --ext-soft: rgba(56, 189, 248, 0.14);
+      --text-main: #eef1f8;
+      --text-muted: #949db8;
+      --text-dim: #646d89;
+      --danger: #f87171;
+      --success: #34d399;
+    }
+
+    body.mode-inner {
+      --bg-main: #110d18;
+      --bg-panel: #191324;
+      --bg-card: #211930;
+      --bg-card-hover: #2a203d;
+      --border: #372952;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg-main);
+      color: var(--text-main);
+      font-family: "Microsoft YaHei", "PingFang SC", -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: background 0.25s ease;
+    }
+
+    /* 顶部导航栏 */
+    .topbar {
+      background: var(--bg-panel);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #f5c96b, #b67617);
+      color: #1b1305;
+      font-weight: 900;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px rgba(240, 185, 82, 0.28);
+    }
+
+    .brand-title {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-family: Consolas, monospace;
+    }
+
+    /* 表里书架切换器 */
+    .zone-switcher {
+      display: flex;
+      background: #10121a;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 3px;
+      gap: 4px;
+    }
+
+    .zone-btn {
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      padding: 7px 14px;
+      border-radius: 7px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.18s;
+    }
+
+    .zone-btn:hover {
+      color: var(--text-main);
+    }
+
+    .zone-btn.active-outer {
+      background: var(--gold-soft);
+      color: var(--gold);
+      border: 1px solid var(--gold-border);
+    }
+
+    .zone-btn.active-inner {
+      background: var(--inner-soft);
+      color: var(--inner-accent);
+      border: 1px solid var(--inner-border);
+    }
+
+    .zone-btn.active-all {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+    }
+
+    /* 搜索与顶部动作栏 */
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .search-input {
+      background: #10121a;
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 8px 13px;
+      border-radius: 8px;
+      font-size: 13px;
+      width: 220px;
+      outline: none;
+    }
+
+    .search-input:focus {
+      border-color: var(--gold);
+    }
+
+    .btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      background: var(--bg-card-hover);
+      border-color: #465070;
+    }
+
+    .btn-gold {
+      background: var(--gold-soft);
+      border-color: var(--gold-border);
+      color: var(--gold);
+      font-weight: 600;
+    }
+
+    .btn-gold:hover {
+      background: rgba(240, 185, 82, 0.24);
+    }
+
+    .btn-inner {
+      background: var(--inner-soft);
+      border-color: var(--inner-border);
+      color: var(--inner-accent);
+      font-weight: 600;
+    }
+
+    .btn-inner:hover {
+      background: rgba(192, 132, 252, 0.24);
+    }
+
+    .btn-ext {
+      background: var(--ext-soft);
+      border-color: rgba(56, 189, 248, 0.4);
+      color: var(--ext-accent);
+      font-weight: 600;
+    }
+
+    /* 主体双栏布局 */
+    .workspace {
+      display: flex;
+      flex: 1;
+      min-height: calc(100vh - 65px);
+    }
+
+    /* 左侧分类书架栏 */
+    .sidebar {
+      width: 260px;
+      background: var(--bg-panel);
+      border-right: 1px solid var(--border);
+      padding: 18px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      flex-shrink: 0;
+    }
+
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 6px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .cat-list {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .cat-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 11px;
+      border-radius: 8px;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-size: 14px;
+      border: 1px solid transparent;
+      transition: all 0.15s;
+    }
+
+    .cat-item:hover {
+      background: var(--bg-card);
+      color: var(--text-main);
+    }
+
+    .cat-item.active {
+      background: var(--bg-card);
+      color: var(--gold);
+      border-color: var(--gold-border);
+      font-weight: 600;
+    }
+
+    body.mode-inner .cat-item.active {
+      color: var(--inner-accent);
+      border-color: var(--inner-border);
+    }
+
+    .cat-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .cat-right {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .cat-count {
+      font-size: 11px;
+      background: rgba(255, 255, 255, 0.07);
+      padding: 2px 7px;
+      border-radius: 99px;
+      color: var(--text-muted);
+    }
+
+    .cat-mini-btn {
+      opacity: 0;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 12px;
+      padding: 2px 4px;
+      border-radius: 4px;
+    }
+
+    .cat-item:hover .cat-mini-btn {
+      opacity: 1;
+    }
+
+    .cat-mini-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+    }
+
+    .sidebar-box {
+      margin-top: auto;
+      background: rgba(0, 0, 0, 0.22);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .sidebar-box strong {
+      color: var(--text-main);
+    }
+
+    /* 右侧藏品主展厅 */
+    .main-stage {
+      flex: 1;
+      padding: 20px 26px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      overflow-y: auto;
+    }
+
+    .stage-banner {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .stage-info h2 {
+      font-size: 17px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .stage-info p {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .filter-pills {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .pill {
+      padding: 5px 11px;
+      border-radius: 99px;
+      font-size: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    .pill.active {
+      background: var(--gold-soft);
+      border-color: var(--gold-border);
+      color: var(--gold);
+      font-weight: 600;
+    }
+
+    /* 藏品卡片网格 */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+      gap: 16px;
+    }
+
+    .book-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+      transition: all 0.16s ease;
+      position: relative;
+    }
+
+    .book-card:hover {
+      background: var(--bg-card-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.32);
+    }
+
+    .book-card.zone-inner {
+      border-color: rgba(192, 132, 252, 0.35);
+    }
+
+    .book-card.is-external {
+      border-left: 3px solid var(--ext-accent);
+    }
+
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .type-badge {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-muted);
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .type-badge.ext {
+      background: var(--ext-soft);
+      color: var(--ext-accent);
+    }
+
+    /* 卡片上的表/里一键切换开关 */
+    .zone-toggle-pill {
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      padding: 3px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s;
+    }
+
+    .zone-toggle-pill.outer {
+      background: var(--gold-soft);
+      border-color: var(--gold-border);
+      color: var(--gold);
+    }
+
+    .zone-toggle-pill.inner {
+      background: var(--inner-soft);
+      border-color: var(--inner-border);
+      color: var(--inner-accent);
+    }
+
+    .zone-toggle-pill:hover {
+      filter: brightness(1.18);
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-main);
+      word-break: break-all;
+      line-height: 1.35;
+    }
+
+    .card-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .cat-chip {
+      background: rgba(255, 255, 255, 0.06);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+    }
+
+    .entry-chip {
+      background: rgba(52, 211, 153, 0.13);
+      color: var(--success);
+      border: 1px solid rgba(52, 211, 153, 0.3);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-family: Consolas, monospace;
+    }
+
+    .card-note {
+      font-size: 13px;
+      color: #c5cde0;
+      background: rgba(0, 0, 0, 0.22);
+      border-radius: 8px;
+      padding: 9px 11px;
+      line-height: 1.5;
+      min-height: 40px;
+      word-break: break-word;
+    }
+
+    .card-note.empty {
+      color: var(--text-dim);
+      font-style: italic;
+    }
+
+    .tags-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: rgba(240, 185, 82, 0.1);
+      color: var(--gold);
+      border: 1px solid rgba(240, 185, 82, 0.25);
+    }
+
+    .card-path {
+      font-size: 11px;
+      color: var(--text-dim);
+      font-family: Consolas, monospace;
+      word-break: break-all;
+      background: rgba(0, 0, 0, 0.16);
+      padding: 4px 7px;
+      border-radius: 5px;
+    }
+
+    .card-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: auto;
+      padding-top: 6px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .card-actions .btn {
+      padding: 5px 9px;
+      font-size: 12px;
+    }
+
+    /* 空状态 */
+    .empty-state {
+      background: var(--bg-panel);
+      border: 1px dashed var(--border);
+      border-radius: 14px;
+      padding: 48px 24px;
+      text-align: center;
+      color: var(--text-muted);
+    }
+
+    .empty-state h3 {
+      color: var(--text-main);
+      margin-bottom: 8px;
+      font-size: 17px;
+    }
+
+    .empty-state p {
+      font-size: 13px;
+      max-width: 560px;
+      margin: 0 auto 18px;
+      line-height: 1.6;
+    }
+
+    /* 弹窗通用样式 */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.72);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      padding: 20px;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      width: 100%;
+      max-width: 780px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+      overflow: hidden;
+    }
+
+    .modal.large {
+      max-width: 1020px;
+      height: 86vh;
+    }
+
+    .modal-header {
+      padding: 15px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .modal-header h3 {
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-body {
+      padding: 18px 20px;
+      overflow-y: auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .modal-footer {
+      padding: 13px 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .form-input, .form-select, .form-textarea {
+      background: #10121a;
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 9px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+    }
+
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: var(--gold);
+    }
+
+    .form-textarea {
+      min-height: 120px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    .reader-textarea {
+      flex: 1;
+      width: 100%;
+      background: #11131c;
+      color: #e9edf7;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px;
+      font-size: 15px;
+      line-height: 1.75;
+      resize: none;
+      outline: none;
+      font-family: "Microsoft YaHei", Consolas, sans-serif;
+    }
+
+    /* Toast 提示 */
+    .toast-box {
+      position: fixed;
+      bottom: 22px;
+      right: 22px;
+      z-index: 500;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .toast {
+      background: #23283b;
+      border: 1px solid var(--gold-border);
+      color: #fff;
+      padding: 11px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+      animation: fadeIn 0.2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 顶部栏 -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-icon">阁</div>
+      <div>
+        <div class="brand-title">
+          Gold Mine · 藏宝阁
+          <span id="zoneHeaderBadge" style="font-size:11px; padding:2px 8px; border-radius:99px; background:var(--gold-soft); color:var(--gold);">☀️ 表书架安全区</span>
+        </div>
+        <div class="brand-sub" id="rootDirDisplay">E:\Gold Mine</div>
+      </div>
+    </div>
+
+    <!-- 表 / 里书架切换 -->
+    <div class="zone-switcher">
+      <button class="zone-btn active-outer" id="btnZoneOuter" onclick="setZoneView('outer')">
+        ☀️ 表书架 <span id="countOuter">0</span>
+      </button>
+      <button class="zone-btn" id="btnZoneInner" onclick="setZoneView('inner')">
+        🌙 里书架 (.vault) <span id="countInner">0</span>
+      </button>
+      <button class="zone-btn" id="btnZoneAll" onclick="setZoneView('all')">
+        👁️ 全景 <span id="countAll">0</span>
+      </button>
+    </div>
+
+    <!-- 搜索与全局快捷操作 -->
+    <div class="top-actions">
+      <input type="text" class="search-input" id="searchInput" placeholder="🔍 搜书名、标签、备注、后缀..." oninput="renderCards()" />
+      <button class="btn btn-gold" onclick="copyGlobalPrompt('outer')" title="复制净网版《目录.md》口令，严苛 AI 随便读不炸车">
+        📋 复制【表目录】AI 指引
+      </button>
+      <button class="btn btn-inner" onclick="copyGlobalPrompt('inner')" title="复制完整版《.vault\目录_里.md》口令，丢给老司机 AI">
+        📋 复制【里目录】AI 指引
+      </button>
+      <button class="btn" onclick="openCreateTextModal()">➕ 粘贴新建文稿</button>
+      <button class="btn btn-ext" onclick="openExternalModal()">🔗 原位挂牌外部路径</button>
+      <button class="btn" onclick="openCatalogPreviewModal()">📖 预览目录.md</button>
+      <button class="btn" onclick="openRootInExplorer()" title="在 Windows 资源管理器中打开">📂 打开目录</button>
+      <button class="btn" onclick="loadState(true)" title="立即扫描文件夹、收容 _ 前缀文件并刷新目录">🔄 同步</button>
+    </div>
+  </header>
+
+  <div class="workspace">
+    <!-- 左侧分类书架 -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <span>📂 书架分类目录</span>
+        <button class="btn" style="padding:3px 8px; font-size:11px;" onclick="promptCreateCategory()">+ 新建分类</button>
+      </div>
+
+      <div class="cat-list" id="categoryList"></div>
+
+      <div class="sidebar-box">
+        <div><strong>🛡️ 三重防污染护盾已激活</strong></div>
+        <div style="margin-top:6px;">
+          1. <strong>物理分房</strong>：🌙里书架实体自动收纳于 <code>.vault\</code> 隐藏仓；外层发现 <code>_</code> 开头文件自动带防覆盖保护收容入仓。<br/>
+          2. <strong>全局防扫</strong>：根目录常驻 <code>.ignore</code>，自动屏蔽 AI 默认 grep / find。<br/>
+          3. <strong>原位挂牌</strong>：🔗外部目录切换表/里仅改账本，绝不改名或搬家。
+        </div>
+      </div>
+    </aside>
+
+    <!-- 右侧主展示区 -->
+    <main class="main-stage">
+      <div class="stage-banner">
+        <div class="stage-info">
+          <h2 id="currentShelfTitle">📚 全部藏品</h2>
+          <p id="currentShelfDesc">支持直接在 Windows 文件夹中增删拖入文件，或在此处一键管理表里书架与 AI 导览目录。</p>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+          <div class="filter-pills">
+            <span class="pill active" id="typeAll" onclick="setTypeFilter('all')">全部类型</span>
+            <span class="pill" id="typeText" onclick="setTypeFilter('text')">📝 文本/角色卡</span>
+            <span class="pill" id="typeBundle" onclick="setTypeFilter('bundle')">🧰 工具箱/软件</span>
+            <span class="pill" id="typeMedia" onclick="setTypeFilter('media')">🎬 媒体/网页</span>
+            <span class="pill" id="typeExt" onclick="setTypeFilter('ext')">🔗 外部原位挂牌</span>
+          </div>
+          <button class="btn" id="btnOpenCurrentCatFolder" onclick="openCurrentCategoryFolder()">📂 打开当前分类文件夹</button>
+        </div>
+      </div>
+
+      <div class="cards-grid" id="cardsGrid"></div>
+    </main>
+  </div>
+
+  <!-- 弹窗 1：阅读与在线快改 -->
+  <div class="modal-backdrop" id="readerModal">
+    <div class="modal large">
+      <div class="modal-header">
+        <h3 id="readerTitle">📖 藏品阅读与在线编辑</h3>
+        <div style="display:flex; gap:8px;">
+          <button class="btn" onclick="changeReaderFont(-1)">A-</button>
+          <button class="btn" onclick="changeReaderFont(1)">A+</button>
+          <button class="btn" onclick="copyReaderContent()">📋 复制全文</button>
+          <button class="btn btn-gold" onclick="saveReaderContent()">💾 保存修改回原文件</button>
+          <button class="btn" onclick="closeModal('readerModal')">✖ 关闭</button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div style="font-size:12px; color:var(--text-muted); font-family:Consolas,monospace;" id="readerPathBar"></div>
+        <textarea class="reader-textarea" id="readerTextarea"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- 弹窗 2：媒体与网页档案预览 -->
+  <div class="modal-backdrop" id="previewModal">
+    <div class="modal large">
+      <div class="modal-header">
+        <h3 id="previewTitle">🎬 藏品阁内预览</h3>
+        <div style="display:flex; gap:8px;">
+          <button class="btn" id="btnOpenPreviewNewTab" onclick="openPreviewInNewTab()">↗ 新标签页打开</button>
+          <button class="btn" onclick="closeModal('previewModal')">✖ 关闭</button>
+        </div>
+      </div>
+      <div class="modal-body" id="previewContainer" style="align-items:center; justify-content:center; background:#090b10;"></div>
+    </div>
+  </div>
+
+  <!-- 弹窗 3：编辑藏品备注、标签、入口与分类 -->
+  <div class="modal-backdrop" id="metaModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="metaModalTitle">✏️ 编辑藏品目录说明与属性</h3>
+        <button class="btn" onclick="closeModal('metaModal')">✖</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="metaItemKey" />
+        <div class="form-group" id="metaCustomNameGroup" style="display:none;">
+          <label>挂牌展示名称（仅修改书架显示名，绝不改外部原文件名）</label>
+          <input type="text" class="form-input" id="metaCustomName" />
+        </div>
+        <div class="form-group">
+          <label>所属分类书架</label>
+          <select class="form-select" id="metaCategorySelect"></select>
+        </div>
+        <div class="form-group">
+          <label>干净备注 / AI 读取指引说明（将写入《目录.md》，请勿粘贴敏感正文以防严苛 AI 炸车）</label>
+          <textarea class="form-textarea" id="metaNoteInput" placeholder="例如：米莉亚双态圣女人设卡，日常与临场双模切换；或：天结神缘资源解包工具，支持拆解封包..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>标签（多个标签用逗号或空格分隔）</label>
+          <input type="text" class="form-input" id="metaTagsInput" placeholder="例如：人设卡, 圣女, 常用 或 Galgame, 解包器" />
+        </div>
+        <div class="form-group">
+          <label>工具箱主程序 / 默认启动入口（针对文件夹套装或工具，如 unpack.exe、启动.bat、纪念阅览器.html）</label>
+          <input type="text" class="form-input" id="metaEntryInput" placeholder="留空则自动识别目录下的 .exe / .bat / .py / .html" />
+          <div id="metaDetectedEntriesHint" style="font-size:11px; color:var(--text-muted); margin-top:4px;"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeModal('metaModal')">取消</button>
+        <button class="btn btn-gold" onclick="saveItemMeta()">💾 保存并刷新目录</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 弹窗 4：随手粘贴新建文稿入阁 -->
+  <div class="modal-backdrop" id="createTextModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>➕ 随手粘贴新建文稿入阁</h3>
+        <button class="btn" onclick="closeModal('createTextModal')">✖</button>
+      </div>
+      <div class="modal-body">
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+          <div class="form-group">
+            <label>存入哪个分类架</label>
+            <select class="form-select" id="newTextCategory"></select>
+          </div>
+          <div class="form-group">
+            <label>存入表书架还是里书架</label>
+            <select class="form-select" id="newTextZone">
+              <option value="outer">☀️ 表书架 (E:\Gold Mine\&lt;分类&gt;)</option>
+              <option value="inner">🌙 里书架 (E:\Gold Mine\.vault\&lt;分类&gt;)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>文件名（默认自动补 .md，重名自动防覆盖保护）</label>
+          <input type="text" class="form-input" id="newTextFileName" placeholder="例如：新角色设定.md 或 剧情大纲.txt" />
+        </div>
+        <div class="form-group">
+          <label>目录干净备注（选填，供 AI 看目录快速定位）</label>
+          <input type="text" class="form-input" id="newTextNote" placeholder="一句简短干净的说明..." />
+        </div>
+        <div class="form-group">
+          <label>标签（选填，逗号分隔）</label>
+          <input type="text" class="form-input" id="newTextTags" placeholder="例如：人设, 草稿" />
+        </div>
+        <div class="form-group">
+          <label>正文内容</label>
+          <textarea class="form-textarea" id="newTextContent" style="min-height:200px;" placeholder="在此直接粘贴文本内容..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeModal('createTextModal')">取消</button>
+        <button class="btn btn-gold" onclick="submitCreateText()">💾 立即生成文件并入阁</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 弹窗 5：原位挂牌外部目录/文件 -->
+  <div class="modal-backdrop" id="externalModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>🔗 原位挂牌外部目录 / 文件（只挂号 · 绝不搬家或改名）</h3>
+        <button class="btn" onclick="closeModal('externalModal')">✖</button>
+      </div>
+      <div class="modal-body">
+        <div style="background:var(--ext-soft); border:1px solid rgba(56,189,248,0.35); color:var(--ext-accent); padding:10px 12px; border-radius:8px; font-size:12px; line-height:1.5;">
+          💡 <strong>原位挂牌铁律</strong>：适用于正在外部运行的软件目录（如 DSH、酒馆 SillyTavern、外部盘的 Galgame 解包器或工程）。挂牌后无论是切换「☀️表 / 🌙里」还是摘牌，<strong>只修改藏宝阁自己的目录账本，绝对不会移动、重命名或删除外部原文件</strong>，防止软件断链。
+        </div>
+        <div class="form-group">
+          <label>外部文件夹或文件的完整路径</label>
+          <div style="display:flex; gap:8px;">
+            <input type="text" class="form-input" id="extPathInput" style="flex:1;" placeholder="例如：D:\SillyTavern 或 D:\Tools\Unpacker" />
+            <button class="btn" onclick="pickNativePath('folder')">📁 选文件夹</button>
+            <button class="btn" onclick="pickNativePath('file')">📄 选文件</button>
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+          <div class="form-group">
+            <label>挂在哪个分类架下展示</label>
+            <select class="form-select" id="extCategorySelect"></select>
+          </div>
+          <div class="form-group">
+            <label>初始归入表书架还是里书架</label>
+            <select class="form-select" id="extZoneSelect">
+              <option value="outer">☀️ 表书架 (写入《目录.md》)</option>
+              <option value="inner">🌙 里书架 (仅写入《.vault\目录_里.md》)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>书架展示名称（选填，留空则自动取原文件夹/文件名）</label>
+          <input type="text" class="form-input" id="extNameInput" placeholder="例如：SillyTavern 主酒馆" />
+        </div>
+        <div class="form-group">
+          <label>启动入口文件名（选填，如 Start.bat / unpack.exe）</label>
+          <input type="text" class="form-input" id="extEntryInput" placeholder="例如：Start.bat" />
+        </div>
+        <div class="form-group">
+          <label>目录备注 / AI 使用说明</label>
+          <textarea class="form-textarea" id="extNoteInput" style="min-height:80px;" placeholder="写清这个外部目录或工具是干嘛的、AI 该怎么配合使用..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeModal('externalModal')">取消</button>
+        <button class="btn btn-ext" onclick="submitExternalAdd()">🔗 立即原位挂牌</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 弹窗 6：预览生成的《目录.md》与《目录_里.md》 -->
+  <div class="modal-backdrop" id="catalogPreviewModal">
+    <div class="modal large">
+      <div class="modal-header">
+        <h3>📖 实时生成的 AI 导览目录预览</h3>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-gold" onclick="loadCatalogPreview('outer')">☀️ 看《目录.md》(表)</button>
+          <button class="btn btn-inner" onclick="loadCatalogPreview('inner')">🌙 看《.vault\目录_里.md》(里)</button>
+          <button class="btn" onclick="closeModal('catalogPreviewModal')">✖ 关闭</button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div id="catalogPreviewPath" style="font-size:12px; color:var(--text-muted); font-family:Consolas,monospace;"></div>
+        <textarea class="reader-textarea" id="catalogPreviewText" readonly></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-box" id="toastBox"></div>
+
+  <script>
+    let appState = {
+      rootDir: 'E:\\Gold Mine',
+      vaultDir: 'E:\\Gold Mine\\.vault',
+      outerCatalogPath: 'E:\\Gold Mine\\目录.md',
+      innerCatalogPath: 'E:\\Gold Mine\\.vault\\目录_里.md',
+      categories: [],
+      items: [],
+      logs: []
+    };
+
+    let currentZone = 'outer'; // 'outer', 'inner', 'all'
+    let currentCategory = 'ALL';
+    let currentTypeFilter = 'all'; // 'all', 'text', 'bundle', 'media', 'ext'
+    let currentReaderPath = '';
+    let readerFontSize = 15;
+    let currentPreviewUrl = '';
+
+    function getAuthHeaders(extra) {
+      return Object.assign({ 'X-GoldMine-Token': window.__GOLDMINE_TOKEN__ || '' }, extra || {});
+    }
+
+    async function apiGet(url) {
+      const res = await fetch(url, { headers: getAuthHeaders() });
+      return await res.json();
+    }
+
+    async function apiPost(url, data) {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify(data || {})
+      });
+      return await res.json();
+    }
+
+    function showToast(msg) {
+      const box = document.getElementById('toastBox');
+      const el = document.createElement('div');
+      el.className = 'toast';
+      el.textContent = msg;
+      box.appendChild(el);
+      setTimeout(() => { el.remove(); }, 3400);
+    }
+
+    async function copyTextToClipboard(text, successMsg) {
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast(successMsg || '已复制到剪贴板！');
+      } catch (e) {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        ta.remove();
+        showToast(successMsg || '已复制到剪贴板！');
+      }
+    }
+
+    async function loadState(manualToast) {
+      try {
+        const data = await apiGet('/api/state');
+        if (data && data.ok) {
+          appState = data;
+          document.getElementById('rootDirDisplay').textContent =
+            currentZone === 'inner' ? appState.vaultDir : appState.rootDir;
+          updateZoneCounts();
+          renderSidebar();
+          renderCards();
+          if (manualToast) showToast('🔄 已同步文件夹并更新表/里目录！');
+        }
+      } catch (e) {
+        showToast('连接藏宝阁本地服务失败，请确认藏宝阁.exe正在运行');
+      }
+    }
+
+    function updateZoneCounts() {
+      const outerItems = appState.items.filter(x => x.zone === 'outer');
+      const innerItems = appState.items.filter(x => x.zone === 'inner');
+      document.getElementById('countOuter').textContent = outerItems.length;
+      document.getElementById('countInner').textContent = innerItems.length;
+      document.getElementById('countAll').textContent = appState.items.length;
+    }
+
+    function setZoneView(zone) {
+      currentZone = zone;
+      document.body.classList.toggle('mode-inner', zone === 'inner');
+
+      document.getElementById('btnZoneOuter').className = 'zone-btn' + (zone === 'outer' ? ' active-outer' : '');
+      document.getElementById('btnZoneInner').className = 'zone-btn' + (zone === 'inner' ? ' active-inner' : '');
+      document.getElementById('btnZoneAll').className = 'zone-btn' + (zone === 'all' ? ' active-all' : '');
+
+      const badge = document.getElementById('zoneHeaderBadge');
+      if (zone === 'outer') {
+        badge.textContent = '☀️ 表书架安全区';
+        badge.style.background = 'var(--gold-soft)';
+        badge.style.color = 'var(--gold)';
+        document.getElementById('rootDirDisplay').textContent = appState.rootDir;
+      } else if (zone === 'inner') {
+        badge.textContent = '🌙 里书架隐藏仓 (.vault)';
+        badge.style.background = 'var(--inner-soft)';
+        badge.style.color = 'var(--inner-accent)';
+        document.getElementById('rootDirDisplay').textContent = appState.vaultDir;
+      } else {
+        badge.textContent = '👁️ 表+里全景模式';
+        badge.style.background = 'rgba(255,255,255,0.12)';
+        badge.style.color = '#fff';
+        document.getElementById('rootDirDisplay').textContent = appState.rootDir;
+      }
+
+      renderSidebar();
+      renderCards();
+    }
+
+    function setTypeFilter(t) {
+      currentTypeFilter = t;
+      ['all', 'text', 'bundle', 'media', 'ext'].forEach(k => {
+        const id = 'type' + k.charAt(0).toUpperCase() + k.slice(1);
+        const el = document.getElementById(id);
+        if (el) el.classList.toggle('active', k === t);
+      });
+      renderCards();
+    }
+
+    function renderSidebar() {
+      const list = document.getElementById('categoryList');
+      list.innerHTML = '';
+
+      const zoneFiltered = appState.items.filter(it => currentZone === 'all' ? true : it.zone === currentZone);
+
+      const allEl = document.createElement('div');
+      allEl.className = 'cat-item' + (currentCategory === 'ALL' ? ' active' : '');
+      allEl.onclick = () => { currentCategory = 'ALL'; renderSidebar(); renderCards(); };
+      allEl.innerHTML = `
+        <div class="cat-left"><span>📚</span><span>全部藏品</span></div>
+        <div class="cat-right"><span class="cat-count">${zoneFiltered.length}</span></div>
+      `;
+      list.appendChild(allEl);
+
+      appState.categories.forEach(cat => {
+        const count = currentZone === 'outer' ? cat.outerCount : (currentZone === 'inner' ? cat.innerCount : cat.totalCount);
+        const item = document.createElement('div');
+        item.className = 'cat-item' + (currentCategory === cat.name ? ' active' : '');
+        item.onclick = () => { currentCategory = cat.name; renderSidebar(); renderCards(); };
+
+        item.innerHTML = `
+          <div class="cat-left">
+            <span>📂</span>
+            <span title="${escapeHtml(cat.name)}">${escapeHtml(cat.name)}</span>
+          </div>
+          <div class="cat-right">
+            <button class="cat-mini-btn" title="重命名该分类" onclick="event.stopPropagation(); promptRenameCategory('${escapeJs(cat.name)}')">✏️</button>
+            <button class="cat-mini-btn" title="删除空分类" onclick="event.stopPropagation(); promptDeleteCategory('${escapeJs(cat.name)}')">🗑️</button>
+            <span class="cat-count">${count}</span>
+          </div>
+        `;
+        list.appendChild(item);
+      });
+    }
+
+    function renderCards() {
+      const grid = document.getElementById('cardsGrid');
+      const query = (document.getElementById('searchInput').value || '').trim().toLowerCase();
+
+      const titleEl = document.getElementById('currentShelfTitle');
+      const descEl = document.getElementById('currentShelfDesc');
+      const zoneLabel = currentZone === 'outer' ? '☀️ 表书架' : (currentZone === 'inner' ? '🌙 里书架 (.vault)' : '👁️ 表+里全景');
+      titleEl.textContent = (currentCategory === 'ALL' ? '📚 全部藏品' : '📂 ' + currentCategory) + ' · ' + zoneLabel;
+
+      if (currentZone === 'inner') {
+        descEl.textContent = '当前位于 .vault 独立隐藏仓，外层 ls 与默认全局搜索均已自动隔离；在外层丢入 _ 开头文件也会自动收容至此。';
+      } else {
+        descEl.textContent = '当前位于表书架安全区，所有条目均以净网格式登记在《E:\\Gold Mine\\目录.md》，任何 AI 均可安全查阅。';
+      }
+
+      const filtered = appState.items.filter(it => {
+        if (currentZone !== 'all' && it.zone !== currentZone) return false;
+        if (currentCategory !== 'ALL' && it.category.toLowerCase() !== currentCategory.toLowerCase()) return false;
+
+        if (currentTypeFilter === 'text' && it.itemType !== 'text') return false;
+        if (currentTypeFilter === 'bundle' && it.itemType !== 'bundle' && it.itemType !== 'tool') return false;
+        if (currentTypeFilter === 'media' && it.itemType !== 'media' && it.itemType !== 'html') return false;
+        if (currentTypeFilter === 'ext' && !it.isExternal) return false;
+
+        if (query) {
+          const hay = (it.name + ' ' + it.category + ' ' + it.note + ' ' + (it.tags || []).join(' ') + ' ' + it.ext + ' ' + it.fullPath).toLowerCase();
+          if (!hay.includes(query)) return false;
+        }
+        return true;
+      });
+
+      grid.innerHTML = '';
+      if (filtered.length === 0) {
+        const targetFolderHint = currentCategory === 'ALL'
+          ? (currentZone === 'inner' ? appState.vaultDir : appState.rootDir)
+          : ((currentZone === 'inner' ? appState.vaultDir : appState.rootDir) + '\\' + currentCategory);
+
+        grid.innerHTML = `
+          <div class="empty-state" style="grid-column: 1 / -1;">
+            <h3>✨ 当前书架空空如也</h3>
+            <p>
+              你可以直接打开 Windows 文件夹把角色卡、小说产出、解包工具文件夹拖进：<br/>
+              <code style="color:var(--gold);">${escapeHtml(targetFolderHint)}</code><br/>
+              （若在外层表目录放入以 <code>_</code> 开头的文件或文件夹，系统会自动带防覆盖保护将它收容进 <code>.vault</code> 里书架！）
+            </p>
+            <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+              <button class="btn btn-gold" onclick="openCurrentCategoryFolder()">📂 直接打开该 Windows 文件夹塞东西</button>
+              <button class="btn" onclick="openCreateTextModal()">➕ 在网页随手粘贴新建文稿</button>
+              <button class="btn btn-ext" onclick="openExternalModal()">🔗 原位挂牌外部目录 (DSH/酒馆等)</button>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach(it => {
+        const card = document.createElement('div');
+        card.className = 'book-card' + (it.zone === 'inner' ? ' zone-inner' : '') + (it.isExternal ? ' is-external' : '');
+
+        const badgeText = getBadgeLabel(it);
+        const zoneSwitchTitle = it.isExternal
+          ? '外部原位挂牌项：点击仅切换《目录.md》与《目录_里.md》账本归属，绝不移动或重命名外部原文件'
+          : (it.zone === 'outer' ? '点击物理搬移进 .vault 里书架（自带同名防覆盖保护）' : '点击从 .vault 物理搬回外层表书架（自带同名防覆盖保护）');
+
+        const tagsHtml = (it.tags && it.tags.length > 0)
+          ? `<div class="tags-row">${it.tags.map(t => `<span class="tag">#${escapeHtml(t)}</span>`).join('')}</div>`
+          : '';
+
+        const entryHtml = it.entry
+          ? `<span class="entry-chip" title="主程序/入口">🚀 ${escapeHtml(it.entry)}</span>`
+          : '';
+
+        const childCountHtml = it.isDirectory
+          ? `<span>📦 含 ${it.childCount} 项</span>`
+          : (it.size > 0 ? `<span>${formatSize(it.size)}</span>` : '');
+
+        const diskWarnHtml = !it.existsOnDisk
+          ? `<span style="color:var(--danger); font-weight:700;">⚠️ 外部路径当前未连接/不存在</span>`
+          : '';
+
+        let primaryBtn = '';
+        if (it.itemType === 'text') {
+          primaryBtn = `<button class="btn btn-gold" onclick="openReader('${escapeJs(it.fullPath)}', '${escapeJs(it.name)}')">📖 阅读/快改</button>`;
+        } else if (it.itemType === 'html' || it.itemType === 'media') {
+          primaryBtn = `<button class="btn btn-gold" onclick="openPreview('${escapeJs(it.fullPath)}', '${escapeJs(it.name)}', '${escapeJs(it.itemType)}', '${escapeJs(it.ext)}')">▶️ 阁内预览</button>`;
+        }
+
+        let runBtn = '';
+        if (it.itemType === 'tool' || it.itemType === 'bundle' || it.entry) {
+          const runLabel = it.entry ? `🚀 启动 ${it.entry}` : '🚀 运行/打开';
+          runBtn = `<button class="btn" style="border-color:rgba(52,211,153,0.4); color:var(--success);" onclick="runItem('${escapeJs(it.fullPath)}', '${escapeJs(it.entry || '')}')">${escapeHtml(runLabel)}</button>`;
+        }
+
+        const unlinkBtn = it.isExternal
+          ? `<button class="btn" style="color:var(--danger);" title="仅从书架账本摘牌，绝不删除外部原文件" onclick="removeExternalItem('${escapeJs(it.key)}', '${escapeJs(it.name)}')">🔌 摘牌</button>`
+          : '';
+
+        card.innerHTML = `
+          <div class="card-top">
+            <span class="type-badge ${it.isExternal ? 'ext' : ''}">${escapeHtml(badgeText)}</span>
+            <button class="zone-toggle-pill ${it.zone}" title="${escapeHtml(zoneSwitchTitle)}" onclick="toggleItemZone('${escapeJs(it.key)}')">
+              ${it.zone === 'outer' ? '☀️ 表书架 ⇄' : '🌙 里书架 (.vault) ⇄'}
+            </button>
+          </div>
+
+          <div class="card-title">${escapeHtml(it.name)}</div>
+
+          <div class="card-meta-row">
+            <span class="cat-chip">📂 ${escapeHtml(it.category)}</span>
+            ${childCountHtml}
+            ${entryHtml}
+            ${diskWarnHtml}
+          </div>
+
+          <div class="card-note ${it.note ? '' : 'empty'}" onclick="openMetaModal('${escapeJs(it.key)}')" title="点击编辑目录备注与入口说明" style="cursor:pointer;">
+            ${it.note ? escapeHtml(it.note) : '✏️ 点击添加干净备注或工具用法说明（写入 AI 目录）...'}
+          </div>
+
+          ${tagsHtml}
+
+          <div class="card-path" title="真实物理路径">${escapeHtml(it.fullPath)}</div>
+
+          <div class="card-actions">
+            ${primaryBtn}
+            ${runBtn}
+            <button class="btn" onclick="openInExplorer('${escapeJs(it.fullPath)}')" title="在 Windows 资源管理器中定位">📂 文件夹</button>
+            <button class="btn" onclick="openMetaModal('${escapeJs(it.key)}')" title="修改备注、标签、入口或移动分类">✏️ 备注/分类</button>
+            <button class="btn" onclick="copyItemPrompt('${escapeJs(it.key)}')" title="复制该藏品的精准路径与说明发给 AI">📋 复制AI口令</button>
+            ${unlinkBtn}
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function getBadgeLabel(it) {
+      if (it.isExternal) return it.isDirectory ? '🔗 外部原位目录' : '🔗 外部原位文件';
+      if (it.itemType === 'text') return '📝 文本/角色卡';
+      if (it.itemType === 'bundle') return '🧰 工具箱/套装';
+      if (it.itemType === 'tool') return '⚙️ 工具/程序';
+      if (it.itemType === 'html') return '🌐 网页阅览器';
+      if (it.itemType === 'media') return '🎬 媒体资产';
+      return '📦 藏品文件';
+    }
+
+    function formatSize(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
+    }
+
+    async function toggleItemZone(key) {
+      const res = await apiPost('/api/item/toggle-zone', { key });
+      if (res.ok) {
+        showToast(res.message);
+        await loadState(false);
+      } else {
+        showToast('❌ ' + (res.error || '切换失败'));
+      }
+    }
+
+    async function promptCreateCategory() {
+      const name = prompt('请输入新书架分类名称（将在 E:\\Gold Mine 下创建对应文件夹）：');
+      if (!name || !name.trim()) return;
+      const res = await apiPost('/api/category/create', { name: name.trim() });
+      if (res.ok) {
+        showToast(res.message);
+        currentCategory = name.trim().replace(/^_+/, '');
+        await loadState(false);
+      } else {
+        showToast('❌ ' + (res.error || '创建失败'));
+      }
+    }
+
+    async function promptRenameCategory(oldName) {
+      const newName = prompt(`将分类「${oldName}」重命名为：`, oldName);
+      if (!newName || !newName.trim() || newName.trim() === oldName) return;
+      const res = await apiPost('/api/category/rename', { oldName, newName: newName.trim() });
+      if (res.ok) {
+        showToast(res.message);
+        if (currentCategory === oldName) currentCategory = newName.trim().replace(/^_+/, '');
+        await loadState(false);
+      } else {
+        showToast('❌ ' + (res.error || '重命名失败'));
+      }
+    }
+
+    async function promptDeleteCategory(name) {
+      if (!confirm(`确定要删除分类架「${name}」吗？（为保护数据安全，仅允许删除没有实体文件的空分类架）`)) return;
+      const res = await apiPost('/api/category/delete', { name });
+      if (res.ok) {
+        showToast(res.message);
+        if (currentCategory === name) currentCategory = 'ALL';
+        await loadState(false);
+      } else {
+        showToast('❌ ' + (res.error || '删除失败'));
+      }
+    }
+
+    async function openInExplorer(path) {
+      const res = await apiPost('/api/action/open-explorer', { path });
+      if (res.ok) showToast('📂 ' + (res.message || '已置顶弹出文件夹'));
+      else showToast('❌ ' + res.error);
+    }
+
+    async function openRootInExplorer() {
+      const target = currentZone === 'inner' ? appState.vaultDir : appState.rootDir;
+      await openInExplorer(target);
+    }
+
+    async function openCurrentCategoryFolder() {
+      const baseDir = currentZone === 'inner' ? appState.vaultDir : appState.rootDir;
+      const target = currentCategory === 'ALL' ? baseDir : (baseDir + '\\' + currentCategory);
+      await openInExplorer(target);
+    }
+
+    async function runItem(path, entry) {
+      const res = await apiPost('/api/action/run', { path, entry });
+      if (res.ok) showToast('🚀 ' + res.message);
+      else showToast('❌ ' + res.error);
+    }
+
+    /* 在线阅读器与快改 */
+    async function openReader(path, name) {
+      currentReaderPath = path;
+      document.getElementById('readerTitle').textContent = '📖 ' + name;
+      document.getElementById('readerPathBar').textContent = '路径：' + path;
+      document.getElementById('readerTextarea').value = '正在加载内容...';
+      document.getElementById('readerModal').classList.add('open');
+
+      const data = await apiGet('/api/item/content?path=' + encodeURIComponent(path));
+      if (data.ok) {
+        document.getElementById('readerTextarea').value = data.content;
+      } else {
+        document.getElementById('readerTextarea').value = '读取失败：' + data.error;
+      }
+    }
+
+    function changeReaderFont(delta) {
+      readerFontSize = Math.max(12, Math.min(26, readerFontSize + delta));
+      document.getElementById('readerTextarea').style.fontSize = readerFontSize + 'px';
+    }
+
+    function copyReaderContent() {
+      const val = document.getElementById('readerTextarea').value;
+      copyTextToClipboard(val, '📋 已复制全文内容！');
+    }
+
+    async function saveReaderContent() {
+      const content = document.getElementById('readerTextarea').value;
+      const res = await apiPost('/api/item/save-content', { path: currentReaderPath, content });
+      if (res.ok) {
+        showToast('💾 已直接保存修改回原文件！');
+        await loadState(false);
+      } else {
+        showToast('❌ ' + res.error);
+      }
+    }
+
+    /* 媒体与 HTML 预览（兼容预览票机制） */
+    let currentPreviewPath = '';
+    async function openPreview(path, name, itemType, ext) {
+      document.getElementById('previewTitle').textContent = '🎬 ' + name;
+      currentPreviewPath = path;
+      const box = document.getElementById('previewContainer');
+      box.innerHTML = '<div style="color:var(--text-muted);">正在签发预览票…</div>';
+      document.getElementById('previewModal').classList.add('open');
+
+      const res = await apiPost('/api/raw/ticket', { path });
+      if (!res || !res.ok || !res.url) {
+        box.innerHTML = `<div style="color:var(--text-muted);">${escapeHtml((res && res.error) || '无法签发预览票')}</div>`;
+        return;
+      }
+      const rawUrl = res.url;
+      currentPreviewUrl = rawUrl;
+
+      if (itemType === 'html' || ext === '.html' || ext === '.htm') {
+        box.innerHTML = `<iframe src="${rawUrl}" sandbox="allow-scripts allow-forms allow-downloads allow-modals" referrerpolicy="no-referrer" style="width:100%; height:100%; border:none; border-radius:8px; background:#fff;"></iframe>`;
+      } else if (['.mp4', '.webm', '.mov', '.mkv'].includes(ext)) {
+        box.innerHTML = `<video src="${rawUrl}" controls autoplay style="max-width:100%; max-height:100%; border-radius:8px;"></video>`;
+      } else if (['.mp3', '.wav', '.ogg', '.flac', '.m4a'].includes(ext)) {
+        box.innerHTML = `<div style="text-align:center; padding:40px;"><div style="font-size:48px; margin-bottom:20px;">🎵</div><audio src="${rawUrl}" controls autoplay style="width:420px;"></audio></div>`;
+      } else if (['.png', '.jpg', '.jpeg', '.gif', '.webp', '.bmp', '.svg'].includes(ext)) {
+        box.innerHTML = `<img src="${rawUrl}" style="max-width:100%; max-height:100%; object-fit:contain; border-radius:8px;" />`;
+      } else {
+        box.innerHTML = `<div style="color:var(--text-muted);">该格式暂不支持内嵌预览，请点击卡片上的「📂 文件夹」或「🚀 运行」打开。</div>`;
+      }
+    }
+
+    async function openPreviewInNewTab() {
+      if (!currentPreviewPath) return;
+      const res = await apiPost('/api/raw/ticket', { path: currentPreviewPath });
+      if (res && res.ok && res.url) window.open(res.url, '_blank', 'noopener,noreferrer');
+    }
+
+    /* 编辑备注、分类与主程序入口 */
+    function openMetaModal(key) {
+      const it = appState.items.find(x => x.key === key);
+      if (!it) return;
+
+      document.getElementById('metaItemKey').value = it.key;
+      document.getElementById('metaModalTitle').textContent = '✏️ 编辑藏品：' + it.name;
+
+      const customNameGroup = document.getElementById('metaCustomNameGroup');
+      if (it.isExternal) {
+        customNameGroup.style.display = 'flex';
+        document.getElementById('metaCustomName').value = it.name;
+      } else {
+        customNameGroup.style.display = 'none';
+      }
+
+      const catSelect = document.getElementById('metaCategorySelect');
+      catSelect.innerHTML = appState.categories.map(c =>
+        `<option value="${escapeHtml(c.name)}" ${c.name === it.category ? 'selected' : ''}>${escapeHtml(c.name)}</option>`
+      ).join('');
+
+      document.getElementById('metaNoteInput').value = it.note || '';
+      document.getElementById('metaTagsInput').value = (it.tags || []).join(', ');
+      document.getElementById('metaEntryInput').value = it.entry || '';
+
+      const hint = document.getElementById('metaDetectedEntriesHint');
+      if (it.detectedEntries && it.detectedEntries.length > 0) {
+        hint.innerHTML = '已自动探测到目录内入口候选：' + it.detectedEntries.map(e =>
+          `<a href="javascript:void(0)" style="color:var(--gold); margin-right:8px;" onclick="document.getElementById('metaEntryInput').value='${escapeJs(e)}'">${escapeHtml(e)}</a>`
+        ).join('');
+      } else {
+        hint.textContent = '';
+      }
+
+      document.getElementById('metaModal').classList.add('open');
+    }
+
+    async function saveItemMeta() {
+      const key = document.getElementById('metaItemKey').value;
+      const it = appState.items.find(x => x.key === key);
+      if (!it) return;
+
+      const targetCategory = document.getElementById('metaCategorySelect').value;
+      const note = document.getElementById('metaNoteInput').value.trim();
+      const tags = document.getElementById('metaTagsInput').value.trim();
+      const entry = document.getElementById('metaEntryInput').value.trim();
+      const customName = document.getElementById('metaCustomName').value.trim();
+
+      await apiPost('/api/item/meta', { key, name: customName, note, tags, entry });
+
+      if (targetCategory && targetCategory !== it.category) {
+        await apiPost('/api/item/move-category', { key, targetCategory });
+      }
+
+      closeModal('metaModal');
+      showToast('💾 已更新目录备注与分类！');
+      await loadState(false);
+    }
+
+    /* 随手粘贴新建文稿 */
+    function openCreateTextModal() {
+      const catSelect = document.getElementById('newTextCategory');
+      catSelect.innerHTML = appState.categories.map(c =>
+        `<option value="${escapeHtml(c.name)}" ${(currentCategory !== 'ALL' && c.name === currentCategory) ? 'selected' : ''}>${escapeHtml(c.name)}</option>`
+      ).join('');
+      document.getElementById('newTextZone').value = (currentZone === 'inner') ? 'inner' : 'outer';
+      document.getElementById('newTextFileName').value = '';
+      document.getElementById('newTextNote').value = '';
+      document.getElementById('newTextTags').value = '';
+      document.getElementById('newTextContent').value = '';
+      document.getElementById('createTextModal').classList.add('open');
+    }
+
+    async function submitCreateText() {
+      const category = document.getElementById('newTextCategory').value;
+      const zone = document.getElementById('newTextZone').value;
+      const fileName = document.getElementById('newTextFileName').value.trim();
+      const note = document.getElementById('newTextNote').value.trim();
+      const tags = document.getElementById('newTextTags').value.trim();
+      const content = document.getElementById('newTextContent').value;
+
+      if (!fileName) {
+        showToast('请输入文件名');
+        return;
+      }
+      const res = await apiPost('/api/item/create-text', { category, zone, fileName, note, tags, content });
+      if (res.ok) {
+        closeModal('createTextModal');
+        showToast('✅ ' + res.message);
+        await loadState(false);
+      } else {
+        showToast('❌ ' + res.error);
+      }
+    }
+
+    /* 原位挂牌外部目录 / 文件 */
+    function openExternalModal() {
+      const catSelect = document.getElementById('extCategorySelect');
+      catSelect.innerHTML = appState.categories.map(c =>
+        `<option value="${escapeHtml(c.name)}" ${(currentCategory !== 'ALL' && c.name === currentCategory) ? 'selected' : ''}>${escapeHtml(c.name)}</option>`
+      ).join('');
+      document.getElementById('extZoneSelect').value = (currentZone === 'inner') ? 'inner' : 'outer';
+      document.getElementById('extPathInput').value = '';
+      document.getElementById('extNameInput').value = '';
+      document.getElementById('extEntryInput').value = '';
+      document.getElementById('extNoteInput').value = '';
+      document.getElementById('externalModal').classList.add('open');
+    }
+
+    async function pickNativePath(mode) {
+      const res = await apiPost('/api/dialog/pick', { mode });
+      if (res.ok && res.pickedPath) {
+        document.getElementById('extPathInput').value = res.pickedPath;
+      }
+    }
+
+    async function submitExternalAdd() {
+      const externalPath = document.getElementById('extPathInput').value.trim();
+      const category = document.getElementById('extCategorySelect').value;
+      const zone = document.getElementById('extZoneSelect').value;
+      const name = document.getElementById('extNameInput').value.trim();
+      const entry = document.getElementById('extEntryInput').value.trim();
+      const note = document.getElementById('extNoteInput').value.trim();
+
+      if (!externalPath) {
+        showToast('请填写或选择外部路径');
+        return;
+      }
+      const res = await apiPost('/api/external/add', { externalPath, category, zone, name, entry, note });
+      if (res.ok) {
+        closeModal('externalModal');
+        showToast('🔗 ' + res.message);
+        await loadState(false);
+      } else {
+        showToast('❌ ' + res.error);
+      }
+    }
+
+    async function removeExternalItem(key, name) {
+      if (!confirm(`确定将外部挂牌项「${name}」从藏宝阁摘牌吗？\n（放心：只从藏宝阁目录移除记录，外部原盘文件绝对不会受任何影响）`)) return;
+      const res = await apiPost('/api/external/remove', { key });
+      if (res.ok) {
+        showToast(res.message);
+        await loadState(false);
+      } else {
+        showToast('❌ ' + res.error);
+      }
+    }
+
+    /* 预览生成的《目录.md》与《目录_里.md》 */
+    async function openCatalogPreviewModal() {
+      document.getElementById('catalogPreviewModal').classList.add('open');
+      await loadCatalogPreview(currentZone === 'inner' ? 'inner' : 'outer');
+    }
+
+    async function loadCatalogPreview(which) {
+      const targetPath = which === 'inner' ? appState.innerCatalogPath : appState.outerCatalogPath;
+      document.getElementById('catalogPreviewPath').textContent = '文件位置：' + targetPath;
+      const data = await apiGet('/api/item/content?path=' + encodeURIComponent(targetPath));
+      if (data.ok) {
+        document.getElementById('catalogPreviewText').value = data.content;
+      }
+    }
+
+    /* 一键复制给 AI 的口令 */
+    function copyGlobalPrompt(which) {
+      if (which === 'inner') {
+        const text = `请先读取我的藏宝阁【里目录】索引文件：\`${appState.innerCatalogPath}\` ，像查阅书单一样根据分类、名称和说明精准定位所需路径后再读取目标文件（切勿盲目全盘扫描）；若需将新产出归档入里书架，请保存在 \`E:\\Gold Mine\\.vault\\<分类名>\\\` 下。`;
+        copyTextToClipboard(text, '📋 已复制【里目录 (.vault)】AI 导览口令！');
+      } else {
+        const text = `请先读取我的藏宝阁【表目录】索引文件：\`${appState.outerCatalogPath}\` ，像查阅图书目录一样按需精准读取对应分类下的目标文件路径；若需归档新产出，请保存在 \`E:\\Gold Mine\\<分类名>\\\` 对应分类下。`;
+        copyTextToClipboard(text, '📋 已复制【表目录 (净网安全版)】AI 导览口令！');
+      }
+    }
+
+    function copyItemPrompt(key) {
+      const it = appState.items.find(x => x.key === key);
+      if (!it) return;
+
+      let text = '';
+      if (it.itemType === 'bundle' || it.itemType === 'tool') {
+        text = `请调用或查看我藏宝阁【${it.category}】下的工具/工程「${it.name}」：\n- 路径：\`${it.fullPath}\``;
+        if (it.entry) text += `\n- 主程序/入口：\`${it.entry}\``;
+        if (it.note) text += `\n- 说明：${it.note}`;
+      } else {
+        text = `请直接读取我藏宝阁【${it.category}】下的「${it.name}」：\n- 路径：\`${it.fullPath}\``;
+        if (it.note) text += `\n- 说明：${it.note}`;
+      }
+      copyTextToClipboard(text, `📋 已复制「${it.name}」的 AI 直达口令！`);
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('open');
+      if (id === 'previewModal') {
+        document.getElementById('previewContainer').innerHTML = '';
+      }
+    }
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function escapeJs(str) {
+      return String(str || '')
+        .replace(/\\/g, '\\\\')
+        .replace(/'/g, "\\'")
+        .replace(/"/g, '\\"')
+        .replace(/\r/g, '')
+        .replace(/\n/g, ' ');
+    }
+
+    loadState(false);
+  </script>
+</body>
+</html>

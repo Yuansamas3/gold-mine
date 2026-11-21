@@ -1,0 +1,10 @@
+# Runtime ledger & auto-generated catalogs (only ship empty shelf template)
+.vault/.goldmine.json
+.vault/*.log
+目录.md
+.vault/目录_里.md
+
+# OS artifacts
+.DS_Store
+Thumbs.db
+desktop.ini

@@ -1,0 +1,7 @@
+# Gold Mine 里书架与内部元数据隔离规则（防全局 grep/rg/find 误扫污染上下文）
+.vault/
+.vault/**
+**/目录_里.md
+目录_里.md
+_*
+**/_*
