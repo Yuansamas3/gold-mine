@@ -14,7 +14,7 @@
 ## 界面实机预览
 
 ### 1. Eclipse 双牌门扉入口（星辉表书架 × 黑曜里圣所）
-> 🎨 **门扉角色立绘致谢**：入口双牌立绘形象（`starlight.png` / `obsidian.png`）源自哔哩哔哩 UP 主 **[ZipZipPipe](https://space.bilibili.com/4168597)** 的 AI 拟人化系列创作，美术版权归原作者所有（右上角支持一键切换纯几何无立绘模式）。
+*(门扉立绘形象来自 B 站 [@ZipZipPipe](https://space.bilibili.com/4168597)，右上角可随时切换无立绘几何模式)*
 
 ![Eclipse 双牌门扉页](./docs/screenshots/01-eclipse-gate.png)
 
@@ -59,7 +59,6 @@
 
 ---
 
-## 致谢与版权声明 (Credits & License)
+## License
 
-- **美术立绘署名**：门扉页所含角色立绘素材（`.vault/ui/assets/starlight.png` 与 `obsidian.png`）出自哔哩哔哩创作者 **[ZipZipPipe](https://space.bilibili.com/4168597)**，相关角色设计与插画版权归原作者所有，不在下方代码开源许可范围内，严禁将相关立绘素材用于任何商业用途；如有侵权或不妥之处请联系移除（界面右上角亦内置纯几何模式开关）。
-- **源码开源协议**：本项目程序源码（[MIT](./LICENSE)）按原样免费开源供个人学习交流。
+[MIT](./LICENSE)（门扉 AI 立绘来自 B 站 [@ZipZipPipe](https://space.bilibili.com/4168597)）
